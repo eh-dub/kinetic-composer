@@ -122,7 +122,7 @@ window.onload = function()
                     var mousePos = stagePortable.getMousePosition();
                     
                     noteCursorLayer.clear();
-                    noteCursor.setX( mousePos.X - noteRadius);
+                    noteCursor.setX( mousePos.x - noteRadius);
                     noteCursor.setY( ellipseY );
                     noteCursorLayer.add( guideLine );
                     noteCursorLayer.add( noteCursor );
