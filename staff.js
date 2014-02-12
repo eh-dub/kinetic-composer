@@ -28,27 +28,38 @@ window.onload = function()
         var staffLayer = new Kinetic.Layer();
         var noteCursorLayer = new Kinetic.Layer();
         var writtenNotesLayer = new Kinetic.Layer();
+        var snapPointLayer = new Kinetic.Layer();
     
          
         var lineHeight = stageHeight/100;
         var lineSpace = (((stageHeight/2) - (lineHeight*5))/ 5)*.8; 
-        //var lineSpace = 40;
         var startHeight = (stageHeight/2 - lineSpace*2.5) + - stageHeight/8;
-        var noteRadius = lineSpace*.48;
+        var noteRadiusY = lineSpace*.48;
+        var noteRadiusX = noteRadiusY*1.5;
+        var noteSpacing = noteRadiusX*2;
+        var widthPadding = 10;
+        
     
         // Lines are counted from the bottom up
         var line = new Kinetic.Line(
             {
-                points: [ 10, startHeight, 890, startHeight ],
+                points: [ widthPadding, startHeight, stageWidth - widthPadding, startHeight ],
                 lineCap: 'round',
                 lineJoin: 'round',
                 stroke: 'black',
-                strokeWidth: lineHeight
+                strokeWidth: lineHeight,
+                hitFunc: function( context )
+                {
+                    var hitPoints = context.getPoints().clone();
+                    hitPoints[1] = hitPoints[1] - lineSpace/4;
+                    hitPoints[1] = hitPoints[3] +lineSpace/4;
+                    this.setPoints(hitPoints);
+                }
             });
         
         var guideLine = new Kinetic.Line(
             {
-                points: [10, startHeight + lineSpace/2, 890, startHeight + lineSpace/2 ],
+                points: [ widthPadding, startHeight + lineSpace/2, stageWidth- widthPadding, startHeight + lineSpace/2 ],
                 lineCap: 'round',
                 lineJoin: 'round',
                 stroke: 'blue',
@@ -57,12 +68,21 @@ window.onload = function()
      
         var invisibleLine = new Kinetic.Line(
             {
-                points: [10, startHeight + lineSpace/2, 890, startHeight + lineSpace/2 ],
+                points: [ widthPadding, startHeight + lineSpace/2, stageWidth - widthPadding, startHeight + lineSpace/2 ],
                 lineCap: 'round',
                 lineJoin: 'round',
                 stroke: 'white',
                 strokeWidth: lineHeight
             }); 
+            
+        var snapPointLine = new Kinetic.Line(
+            {
+                points: [widthPadding, startHeight, widthPadding, startHeight + lineSpace*4 + lineHeight*5],
+                lineCap: 'round',
+                lineJoin: 'round',
+                stroke: 'red',
+                strokeWidth: lineHeight
+            });
             
         // On click callback for note cursor -- writes note
         var noteCursorOnClick = function()
@@ -78,7 +98,7 @@ window.onload = function()
       
         var noteCursor = new Kinetic.Ellipse( 
                 {
-                    radius: { x: 1.5*noteRadius, y: noteRadius }, 
+                    radius: { x: noteRadiusX, y: noteRadiusY }, 
                     x: 0,
                     y: 0,
                     stroke: 'black',
@@ -103,7 +123,7 @@ window.onload = function()
                 {
                     var mousePos = stagePortable.getMousePosition();
                     noteCursorLayer.clear();
-                    noteCursor.setX( mousePos.x - noteRadius);
+                    noteCursor.setX( mousePos.x);
                     noteCursor.setY( ellipseY );
                     noteCursorLayer.add( noteCursor );
                     guideLine.setPoints( [10, -50, 890, -50] );
@@ -122,11 +142,11 @@ window.onload = function()
                     var mousePos = stagePortable.getMousePosition();
                     
                     noteCursorLayer.clear();
-                    noteCursor.setX( mousePos.x - noteRadius);
+                    noteCursor.setX( mousePos.x);
                     noteCursor.setY( ellipseY );
                     noteCursorLayer.add( guideLine );
                     noteCursorLayer.add( noteCursor );
-                    guideLine.setPoints( [10, ellipseY, 890, ellipseY] );
+                    guideLine.setPoints( [widthPadding, ellipseY, stageWidth-widthPadding, ellipseY] );
                     noteCursorLayer.draw();
                     console.log( 'callback: ellipseY = ' + ellipseY );
                 }
@@ -158,12 +178,19 @@ window.onload = function()
             console.log( line.getOffsetY() );
         }
         
+        for( i = 1; i < stageWidth/noteSpacing; i++ )
+        {
+            snapPointLine.move( { x: noteSpacing, y:0 })
+            snapPointLayer.add(snapPointLine)
+            snapPointLine = snapPointLine.clone();
+        }
             
            __staff.start = function()
            {
                 stage.add( staffLayer );
                 stage.add( noteCursorLayer );
                 stage.add( writtenNotesLayer );
+                stage.add( snapPointLayer );
            }
            
            return __staff;
