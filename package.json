@@ -1,0 +1,23 @@
+{
+ "name": "kinetic-composer",
+ "version": "0.0.1",
+ "author": "Ariel Weingarten & Mark Roukema",
+ 
+ "main": "./server.js",
+ "repository": 
+ {
+     "type": "git",
+     "url": "https://github.com/asweingarten/kinetic-composer.git"
+ },
+ 
+ "dependencies": 
+ {
+     "express": "3.4.8",
+     "logfmt": "0.20.0"
+ },
+ 
+ "engines":
+ {
+     "node": "0.8.x"
+ }
+}
